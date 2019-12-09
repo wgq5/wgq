@@ -1,0 +1,58 @@
+/* Styles go here */
+
+#header {
+    background: #000 url(http://pic.962.net/up/2018-5/2018531057273267.jpg) center;
+    height: 200px;
+    width: 160px;
+    border-bottom: 1px solid #7D7C7D;
+    background-color: #FFF;
+    overflow: hidden;
+}
+
+#header::after{
+    pointer-events: none;
+    content: " ";
+    display: block;
+    width: 2000px;
+    height: 100px;
+    position: absolute;
+    top: 10px;
+    opacity: 1;
+    -webkit-transition-property: opactiy;
+    transition-property: opactiy;
+    -webkit-transition-duration: 5s;
+    transition-duration: 5s;
+
+    background-image: url(https://b-ssl.duitang.com/uploads/item/201707/19/20170719232932_jchtu.jpeg) ;
+    background-image: url(https://b-ssl.duitang.com/uploads/item/201610/09/20161009145430_JTsHX.thumb.700_0.png);
+    
+    -webkit-animation: cloudAnim 35s linear infinite;
+    animation: cloudAnim 35s linear infinite;
+}
+
+
+@-webkit-keyframes cloudAnim {
+    from {
+        -webkit-transform: translateX(-1000px) translateZ(-1000px);
+        transform: translateX(-1000px) translateZ(-1000px)
+    }
+
+    to {
+        -webkit-transform: translateX(1000px) translateZ(-1000px);
+        transform: translateX(1000px) translateZ(-1000px)
+    }
+}
+
+@keyframes cloudAnim {
+    from {
+        -webkit-transform: translateX(-1000px) translateZ(-1000px);
+        -ms-transform: translateX(-1000px) translateZ(-1000px);
+        transform: translateX(-1000px) translateZ(-1000px)
+    }
+
+    to {
+        -webkit-transform: translateX(1000px) translateZ(-1000px);
+        -ms-transform: translateX(1000px) translateZ(-1000px);
+        transform: translateX(1000px) translateZ(-1000px)
+    }
+}

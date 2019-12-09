@@ -1,0 +1,303 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <link rel="stylesheet" href="style.css">
+    <style type="text/css">
+
+body {background-size:70px 75px;font-family:Georgia, serif;}
+p.small {font-variant:small-caps;}  
+.neptuneOrbit {
+  left:20px;
+  top:20px;
+  height: 760px;
+  width: 760px;
+  background-color: transparent;
+  border-radius: 50%;
+  border-style: dashed;
+  border-color: gray;
+  position: absolute;
+  border-width: 1px;
+  /*margin: 100px;*/
+  /*transform-origin: -75px -75px;*/
+  /*animation: rotate 4s infinite linear;*/
+  margin: 0px;
+  padding: 0px;
+}
+
+@keyframes rotate {
+  100% {
+    transform: rotate(-360deg);
+  }
+}
+
+        div
+{
+	width:20px;
+	height:20px;
+	background:red;
+	animation:myfirst 5s;
+	-webkit-animation:myfirst 5s; /* Safari and Chrome */
+}
+
+@keyframes myfirst
+{
+	from {background:rgb(19, 116, 226);}
+	to {background:yellow;}
+}
+
+@-webkit-keyframes myfirst /* Safari and Chrome */
+{
+	from {background:rgb(11, 218, 73);}
+	to {background:rgb(112, 4, 76);}
+}
+        #scoreLabel{
+            display:none;
+            position:absolute;
+            color:red;
+        }
+
+    
+    </style>
+    
+    <script type="text/javascript ">
+
+        
+
+        function showScore(x,y){
+            var sl=document.getElementById("scoreLabel");
+            sl.style.left=x+"px";
+            sl.style.top=y+"px";
+            sl.style.display="block";
+            setTimeout(function(){
+                sl.style.display="none";
+            },1000);
+        }
+        Array.prototype.remove=function(val){
+            var index=this.indexOf(val);
+            if (index>-1){
+                this.splice(index,1);
+            }
+        }
+
+        var YunShi=function(dom,x,y,t,imgs){
+            this.dom=dom;   this.x=x;     this.t=t;    this.y=y;   this.imgs=imgs;
+            this.create=function(){
+                var img=document.createElement("img");
+                img.setAttribute("src",this.imgs[0]);
+                img.setAttribute("width","50px");
+                img.setAttribute("height","50px");
+                this.dom.style.left=x+"px";
+                this.dom.style.top=y+"px";
+                this.dom.appendChild(img);
+                document.body.appendChild(this.dom);
+            }
+            this.autoDestory=function(){
+                   document.body.removeChild(this.dom);
+            }
+            this.noAutoDestory=function(){
+                var time=0;
+                var self=this;
+               var nad=setInterval(function(){
+                   time++;
+                   self.dom.firstChild.setAttribute("src",self.imgs[time]);
+                   if (time==5) {
+                       clearInterval(nad);
+                       document.body.removeChild(self.dom);
+                   }
+                },400);
+            }
+        }
+        //定义飞机对象
+       var Plane=function(dom){
+           this.dom=dom;
+           this.dom.style.position="absolute";
+           this.x=400;
+           this.y=500;
+           this.dom.style.left=this.x+"px";
+           this.dom.style.top=this.y+"px";
+       }
+       //定义飞机的移动方法
+       Plane.prototype.move=function(dx,ds){
+           this.x+=dx;
+           this.dom.style.left=this.x+"px";
+           this.s+=ds;
+           this.dom.style.down=this.s+"px";
+
+        
+
+       }
+         //定义子弹对象
+        var Bullet=function(dom,x,y){
+            this.dom=dom;
+            this.x=x;
+            this.y=y;
+            //定义显示子弹的方法
+            this.show=function(){
+                document.body.appendChild(this.dom);
+                this.dom.style.position="absolute";
+                this.dom.style.left=this.x+"px";
+                this.dom.style.top=this.y+"px";
+            }
+            //定义销毁方法
+            this.destory=function(){
+                document.body.removeChild(this.dom);
+            }
+            //定义子弹的发射方法
+            this.launch=function(yunshis){
+                var that=this;
+                var timeId=setInterval(function(){
+                    that.y-=10;
+                    that.dom.style.top=that.y+"px";
+                    if (that.y==0) { //当子弹运行到屏幕上端时
+                        clearInterval(timeId);
+                        that.destory();
+                    }else{   //子弹没移动到屏幕上端，判断一下子弹射击到了哪个向日葵
+                        for(let i=0;i<yunshis.length;i++) {
+                            if (Math.abs(that.x - yunshis[i].x)< 20 && Math.abs(that.y - yunshis[i].y) <20) {
+                                yunshis[i].noAutoDestory();
+                                yunshis.splice(i, 1);
+                                clearInterval(timeId);
+                                that.destory();
+                                //播放爆炸的声音
+                                var sound=document.getElementById("sound");
+                                sound.currentTime=60; //从音乐文件的第40秒开始播放
+                                sound.play();
+                                //播放4秒后停止
+                                setTimeout(function(){
+                                    sound.pause();
+                                },3000);  //注意如果有那个爆炸的音频，就没这样复杂了，只需要sound.play()即可
+                                showScore(that.x+40,that.y); //显示+15
+                                let score = parseInt(document.getElementById("score").innerText) + 15;
+                                document.getElementById("score").innerText = score; //改变总分
+                                if(score%30==0 && score!=45 && score!=90){
+                                    alert("Amazing");
+                                    if(score==45){
+                                        alert("good");
+                                    }
+                                    if(score==90){
+                                        alert("Unbelievable")
+                                    }
+                                    
+                                }
+                            }
+                        }
+                    }
+                },100);
+            }
+        }
+       //下面闭包定义了向日葵和子弹的创建
+        var gameProgame=(function(){
+            var yunshis=[];
+            function createYunshi(){
+                    let dom=document.createElement("div");   
+                    dom.style.position="absolute";
+                    let x=Math.floor(Math.random()*window.innerWidth);
+                    let y=Math.floor(Math.random()*(window.innerHeight-200));//高度不能超过窗口高度-200，也就是下端200高度的地方不产生陨石
+                    let yunshi=new YunShi(dom,x,y,new Date().getTime(),
+                        ["images/a0.png","images/img0.jpg","images/img3.jpg","images/img2.jpg","images/img1.jpg","images/img1.jpg"]);
+                    yunshi.create();   yunshis.push(yunshi);
+                }
+
+              function yunshiAutoDes(){
+                    for(let i=0;i<yunshis.length;i++){
+                        let now=new Date().getTime();
+                        if (now-yunshis[i].t>=18000) {
+                            yunshis[i].autoDestory();   
+                            yunshis.remove(yunshis[i]);
+                            var sound1=document.getElementById("sound");
+                            sound1.currentTime=70; //从音乐文件的第50秒开始播放
+                            sound1.play();
+                            //播放2秒后停止
+                            setTimeout(function(){
+                                sound.pause();
+                            },3000);
+
+                        }
+                    }
+                }
+
+            window.onload = function(){
+            var p1 = document.createElement("p");
+            var txt1 = document.createTextNode("2017");
+            p1.appendChild(txt1);
+            var parent = document.getElementsByTagName("article")[0];
+            var p2 = document.getElementsByTagName("p")[0];
+            parent.insertBefore(p1,p2);
+            p1.setAttribute("style","background-color:blue;color:red;width:100px;height:200px")
+        }
+
+
+            function createBullet(x,y){
+                var bul=document.createElement("img");
+                bul.setAttribute("src","images/b.jpg");
+                bul.setAttribute("width","20px");
+                bul.setAttribute("height","40px");
+                var bullet=new Bullet(bul,x,y);
+                bullet.show();
+                bullet.launch(yunshis);
+            }
+            //返回一个json对象
+            return{
+                createYunshi:createYunshi,
+                createBullet:createBullet,
+                yunshiDes:yunshiAutoDes,
+            }
+        }) ();
+
+       window.onload=function(){
+           //创建飞机对象
+           var domplane=document.getElementsByTagName("img")[0];
+           var plane=new Plane(domplane);
+           //每隔2秒产生一个向日葵
+           setInterval(function(){
+             gameProgame.createYunshi();
+           },2000);
+           //每隔2秒判断一下那个向日葵该自动销毁了
+           setInterval(function(){
+                gameProgame.yunshiDes();
+           },2000);
+
+           //定义键盘事件
+           document.onkeydown = function (event) {
+               if (event.key == "ArrowUp") {  //当按下上方向键时
+                   plane.move(10);
+               }
+               if (event.key == "ArrowDown") {  //当按下下方向键时
+                   plane.move(10);
+               }
+               if (event.key == "ArrowRight") {  //当按下右方向键时
+                   plane.move(10);
+               }
+               if (event.key == "ArrowLeft") { //当按下左方向键时
+                   plane.move(-10);
+               }
+               if (event.keyCode == 32) {  // 当按下空格键时
+                   gameProgame.createBullet(plane.x+30,plane.y);
+               }
+           }
+       }
+
+       
+
+    </script>
+</head>
+<body background="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1573735466808&di=6692d502c263bb061cb2ed386f8eabe8&imgtype=0&src=http%3A%2F%2Fwww3.qqjay.com%2Fuploads%2Fallimg%2F090715%2F0P4422914-3.gif">
+    <br><br><br><br><br><br>
+        <div id='header'></div>    
+<span id="scoreLabel">+15</span>
+
+<p class="small">总分数：</p>
+<span id="score">0</span>
+<img src="images/plane.jpg" width="80px" height="80px" />
+
+ <audio id="sound">
+     <source src="shimianfly.mp3" type="audio/mpeg">
+     <audio id="sound1">
+         <source src="shimianfly.mp3" type="audio/mpeg">
+ </audio>
+</body>
+</html>
